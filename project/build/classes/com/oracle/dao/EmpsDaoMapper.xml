@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.oracle.dao.EmpsDao">
+
+	<select id="getAll" resultType="emp">
+		select empId,empNo,empName,passWord from tb_emp
+		order by empId
+	</select>
+	
+	<select id="getEmpByNoAndPw" resultType="emp">
+		select * from tb_emp where empNo=#{empNo} and passWord=#{passWord}
+	</select>
+	
+	<select id="getAllEmp" resultType="emp">
+		select empId,empNo,empName,sex,birth,idCard,tel,empType,empTypeName,age from tb_emp
+	</select>
+	
+	<delete id="deleteEmps" parameterType="integer[]">
+		delete from tb_emp 
+		<where>
+			empId in
+			<foreach collection="array" item="empId" open="("  separator=","
+				close=")">
+				#{empId}
+			</foreach>
+		</where>
+	</delete>
+
+	<insert id="addEmp" parameterType="emp">
+		insert into tb_emp values(null,#{empNo},#{passWord},#{empName},#{sex},#{age},date_format(#{birth},'%Y-%c-%e'),
+		#{idCard}
+		,#{email},#{tel},#{address},#{empType}
+		,#{empTypeName},#{bankName},#{bankNo},#{sal},#{comm},#{subsidy},date_format(#{hireDate},'%Y-%c-%e'),#{descript})
+	</insert>
+
+	<update id="updateEmp" parameterType="emp">
+		update tb_emp set passWord=#{passWord},empName=#{empName},sex=#{sex},age=#{age},birth=date_format(#{birth},'%Y-%c-%e'),
+		idCard=#{idCard}
+		,email=#{email},tel=#{tel},address=#{address},empType=#{empType}
+		,empTypeName=#{empTypeName},bankName=#{bankName},bankNo=#{bankNo},
+		sal=#{sal},comm=#{comm},
+		subsidy=#{subsidy},hireDate=date_format(#{hireDate},'%Y-%c-%e'),
+		descript=#{descript} where empId=#{empId}
+	</update>
+	
+	<select id="getEmpById" resultType="emp">
+		select empId,empNo,passWord,empName,sex,age,birth,idCard,email,tel,address,empType,empTypeName
+		,bankName,bankNo,sal,comm,subsidy,hireDate,descript from tb_emp where empId=#{empId}
+	</select>
+
+	<select id="getAllEmpForPage" resultType="emp">
+		select empId,empNo,empName,sex,birth,idCard,tel,empType,empTypeName,age from tb_emp
+		limit #{start},#{size}
+	</select>
+
+	<select id="getECount" resultType="int">
+		select count(*) from tb_emp
+	</select>
+
+</mapper>

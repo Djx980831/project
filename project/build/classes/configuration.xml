@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+
+    <typeAliases>
+       <package name="com.oracle.vo"></package>
+    </typeAliases>
+
+    <!--<settings>-->
+        <!--&lt;!&ndash;&lt;!&ndash; 配置日志组件类型&ndash;&gt;&ndash;&gt;-->
+        <!--&lt;!&ndash;<setting name="logimpl" value="LOG4J"/>&ndash;&gt;-->
+        <!--<setting name="useGeneratetKeys" value="true"></setting>-->
+    <!--</settings>-->
+
+    <environments default="development">
+        <environment id="development">
+            <transactionManager type="JDBC"/>
+            <dataSource type="POOLED">
+                <property name="driver" value="com.mysql.jdbc.Driver"/>
+                <property name="url" value="jdbc:mysql://localhost:3306/project0126"/>
+                <property name="username" value="root"/>
+                <property name="password" value="Djx980831"/>
+            </dataSource>
+        </environment>
+    </environments>
+    <mappers>
+        <mapper resource="com/oracle/dao/SendMessageMapper.xml"></mapper>
+        <mapper resource="com/oracle/dao/ReceiveMessageMapper.xml"></mapper>
+        <mapper resource="com/oracle/dao/EmpsDaoMapper.xml"></mapper>
+        <mapper resource="com/oracle/dao/LogDaoMapper.xml"></mapper>
+        
+    </mappers>
+</configuration>

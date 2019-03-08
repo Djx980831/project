@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.oracle.dao.SendMessageDao">
+
+	<insert id="insert" parameterType="sendMessage" keyProperty="sendId" useGeneratedKeys="true">
+		insert into to_sendMessage values(null,#{empId},#{messageTitle},#{messageContent},now(),#{priority},1)
+	</insert>
+	
+	<select id="getSendMessage" resultMap="mysendMessage">
+		select s.sendID sendID,s.empid empid,messageTitle,MessageContent,createDate,priority,
+		s.MessageState MessageState,receiveId,r.empid receiveId,e.empName receiverName from
+		to_sendmessage s inner join to_receivemessage r on s.sendid=r.sendid inner join tb_emp e on
+		r.empId=e.empId
+		where s.empId=#{empId} and s.messageState=1
+	</select>
+	
+	<resultMap type="sendMessage" id="mysendMessage">
+		<id column="sendid" property="sendId"></id>
+		<result column="empId" property="empId"/>
+		<result column="messageTitle" property="messageTitle"/>
+		<result column="MessageContent" property="messageContent"/>
+		<result column="createDate" property="createDate"/>
+		<result column="priority" property="priority"/>
+		<result column="MessageState" property="messageState"/>
+		
+		<collection property="list" ofType="receiveMessage">
+			<id column="receiveid" property="receiveId"></id>
+			<result column="receiverId" property="empId"/>
+			<association property="receiver" javaType="emp">
+				<id column="receiverId" property="empId"></id>
+				<result column="receiverName" property="empName"/>
+			</association>
+		</collection>
+	</resultMap>
+	
+	<select id="getMessageById" resultMap="getsendMessageById">
+		select s.empid empid,messageTitle,MessageContent,createDate,priority,
+		s.MessageState MessageState,receiveId,r.empid receiveId,e.empName receiverName from
+		to_sendmessage s inner join to_receivemessage r on s.sendid=r.sendid inner join tb_emp e on
+		r.empId=e.empId
+		where s.sendid=#{sendId}
+	</select>
+	
+	<resultMap type="sendMessage" id="getsendMessageById">
+		<id column="sendid" property="sendId"></id>
+		<result column="empId" property="empId"/>
+		<result column="messageTitle" property="messageTitle"/>
+		<result column="MessageContent" property="messageContent"/>
+		<result column="createDate" property="createDate"/>
+		<result column="priority" property="priority"/>
+		<result column="MessageState" property="messageState"/>
+		
+		<collection property="list" ofType="receiveMessage">
+			<id column="receiveid" property="receiveId"></id>
+			<result column="receiverId" property="empId"/>
+			<association property="receiver" javaType="emp">
+				<id column="receiverId" property="empId"></id>
+				<result column="receiverName" property="empName"/>
+			</association>
+		</collection>
+	</resultMap>
+	
+	<update id="DeleteSendMessage" parameterType="integer">
+		update to_sendmessage set messageState=0
+		where sendId=#{sendId}
+	</update>
+	
+	<update id="deleteSendMessages" parameterType="integer[]">
+		update to_sendmessage set messageState=0
+		<where>
+			sendId in
+			<foreach collection="array" item="sendId" open="("  separator=","
+				close=")">
+				#{sendId}
+			</foreach>
+		</where>
+	</update>
+	
+	<select id="getSendMessages" resultMap="mysendMessage">
+		select s.sendID sendID,s.empid empid,messageTitle,MessageContent,createDate,priority,
+		s.MessageState MessageState,receiveId,r.empid receiveId,e.empName receiverName from
+		to_sendmessage s inner join to_receivemessage r on s.sendid=r.sendid inner join tb_emp e on
+		r.empId=e.empId
+		where s.empId=#{empId} and s.messageState=1
+		<trim>
+			<if test="messageTitle != null and messageTitle != ''">
+				and messageTitle like concat('%',#{messageTitle},'%')
+			</if>
+			
+			<if test="empName != null and empName != ''">
+				and e.empName like concat('%',#{empName},'%')
+			</if>
+		</trim>
+	
+	</select>
+	
+	<select id="getSendMessageForPage" resultMap="mysendMessage">
+		select s.sendID sendID,s.empid empid,messageTitle,MessageContent,createDate,priority,
+		s.MessageState MessageState,receiveId,r.empid receiveId,e.empName receiverName from
+		to_sendmessage s inner join to_receivemessage r on s.sendid=r.sendid inner join tb_emp e on
+		r.empId=e.empId
+		where s.empId=#{empId} and s.messageState=1
+		limit #{start},#{size}
+	</select>
+	
+	<select id="getSCount" resultType="int">
+		select count(*) from to_receivemessage r inner join to_sendmessage s
+		on r.sendID=s.sendID inner join tb_emp e 
+		on s.empID=e.empID
+		where s.EmpID=#{empId} and s.MessageState = 1	
+	</select>
+	
+	<select id="getSendMessageByDy" resultMap="mysendMessage">
+		select s.sendID sendID,s.empid empid,messageTitle,MessageContent,createDate,priority,
+		s.MessageState MessageState,receiveId,r.empid receiveId,e.empName receiverName from
+		to_sendmessage s inner join to_receivemessage r on s.sendid=r.sendid inner join tb_emp e on
+		r.empId=e.empId
+		where s.empId=#{map.empId} and s.messageState=1
+		<trim>
+			<if test="map.messageTitle != null and map.messageTitle != ''">
+				and messageTitle like concat('%',#{map.messageTitle},'%')
+			</if>
+			
+			<if test="map.empName != null and map.empName != ''">
+				and e.empName like concat('%',#{map.empName},'%')
+			</if>
+		</trim>
+		limit #{start},#{size}
+	</select>
+	
+	<select id="getSCountByDy" resultType="int">
+		select count(*) from to_receivemessage r inner join to_sendmessage s
+		on r.sendID=s.sendID inner join tb_emp e 
+		on s.empID=e.empID
+		where s.EmpID=#{empId} and s.MessageState = 1	
+		<trim>
+			<if test="messageTitle != null and messageTitle != ''">
+				and messageTitle like concat('%',#{messageTitle},'%')
+			</if>
+			
+			<if test="empName != null and empName != ''">
+				and e.empName like concat('%',#{empName},'%')
+			</if>
+		</trim>
+		
+	</select>
+	
+	
+</mapper>

@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.oracle.dao.ReceiveMessageDao">
+
+	<insert id="insert" parameterType="sendMessage">
+		insert into to_receiveMessage values(null,#{sendId},#{empId},1,null)
+	</insert>
+
+
+	<select id="getReceiveMessage" resultType="map">
+		select receiveId,s.empId empId,messageTitle,empName,s.sendID sendId,createDate,
+		openDate from to_receivemessage r inner join to_sendmessage s
+		on r.sendID=s.sendID inner join tb_emp e 
+		on s.empID=e.empID
+		where r.EmpID=#{empId} and r.MessageState = 1	
+	</select>
+	
+	<update id="updateOpenDate" parameterType="integer">
+		update to_receivemessage set openDate=now()
+		where receiveId=#{receiveId}
+	</update>
+	
+	<select id="getReceiveMessageById" resultType="map">
+		select receiveId,s.empId empId,messageTitle,messageContent,empName,s.sendID sendId,createDate,
+		openDate from to_receivemessage r inner join to_sendmessage s
+		on r.sendID=s.sendID inner join tb_emp e 
+		on s.empID=e.empID
+		where r.receiveId=#{receiveId}	
+	</select>
+	
+	<update id="deleteReceiveMessage" parameterType="integer">
+		update to_receivemessage set messageState=0
+		where receiveId=#{receiveId}
+	</update>
+	
+	<update id="deleteReceiveMessages" parameterType="integer[]">
+		update to_receivemessage set messageState=0
+		<where>
+			receiveId in
+			<foreach collection="array" item="receiveId" open="("  separator=","
+				close=")">
+				#{receiveId}
+			</foreach>
+		</where>
+	</update>
+	
+	<select id="getReceiveMessages" resultType="map">
+		select receiveId,s.empId empId,messageTitle,messageContent,empName,s.sendID sendId,createDate,
+		openDate from to_receivemessage r inner join to_sendmessage s
+		on r.sendID=s.sendID inner join tb_emp e 
+		on s.empID=e.empID
+		where r.EmpID=#{empId} and r.MessageState = 1	
+		<trim>
+			<if test="messageTitle != null and messageTitle != ''">
+				and messageTitle like concat('%',#{messageTitle},'%')
+			</if>
+			
+			<if test="empName != null and empName != ''">
+				and empName like concat('%',#{empName},'%')
+			</if>
+		</trim>
+		
+	</select>
+	
+	<select id="getReceiveMessageForPage" resultType="map">
+		select receiveId,s.empId empId,messageTitle,empName,s.sendID sendId,createDate,
+		openDate from to_receivemessage r inner join to_sendmessage s
+		on r.sendID=s.sendID inner join tb_emp e 
+		on s.empID=e.empID
+		where r.EmpID=#{empId} and r.MessageState = 1
+		limit #{start},#{size}
+	</select>
+	
+	<select id="getReceiveMessageByDy" resultType="map">
+		select receiveId,s.empId empId,messageTitle,messageContent,empName,s.sendID sendId,createDate,
+		openDate from to_receivemessage r inner join to_sendmessage s
+		on r.sendID=s.sendID inner join tb_emp e 
+		on s.empID=e.empID
+		where r.EmpID=#{map.empId} and r.MessageState = 1	
+		<trim>
+			<if test="map.messageTitle != null and map.messageTitle != ''">
+				and messageTitle like concat('%',#{map.messageTitle},'%')
+			</if>
+			
+			<if test="map.empName != null and map.empName != ''">
+				and empName like concat('%',#{map.empName},'%')
+			</if>
+		</trim>
+		limit #{start},#{size}
+	</select>
+
+	<select id="getRCount" resultType="int">
+		select count(*) from to_receivemessage r inner join to_sendmessage s
+		on r.sendID=s.sendID inner join tb_emp e 
+		on s.empID=e.empID
+		where r.EmpID=#{empId} and r.MessageState = 1	
+	</select>
+	
+	<select id="getRCountByDy" resultType="int">
+		select count(*) from to_receivemessage r inner join to_sendmessage s
+		on r.sendID=s.sendID inner join tb_emp e 
+		on s.empID=e.empID
+		where r.EmpID=#{empId} and r.MessageState = 1
+		<trim>
+			<if test="messageTitle != null and messageTitle != ''">
+				and messageTitle like concat('%',#{messageTitle},'%')
+			</if>
+			
+			<if test="empName != null and empName != ''">
+				and empName like concat('%',#{empName},'%')
+			</if>
+		</trim>
+			
+	</select>
+	
+</mapper>
